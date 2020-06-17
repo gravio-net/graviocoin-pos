@@ -1,0 +1,25 @@
+[Unit]
+Description=Graviocoin daemon
+After=network.target
+
+[Service]
+User=graviocoin
+Group=graviocoin
+
+Type=forking
+PIDFile=/home/graviocoin/.graviocoin/graviocoind.pid
+ExecStart=/home/graviocoin/Graviocoin/graviocoind -daemon -pid=/home/graviocoin/.graviocoin/graviocoind.pid \
+-conf=/home/graviocoin/.graviocoin/graviocoin.conf -datadir=/home/graviocoin/.graviocoin
+
+ExecStop=/home/graviocoin/Graviocoin/graviocoin-cli -conf=/home/graviocoin/.graviocoin/graviocoin.conf stop
+ExecStop=/usr/bin/sleep 25
+
+Restart=no
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
