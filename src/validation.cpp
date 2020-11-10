@@ -1554,18 +1554,33 @@ bool CChainState::IsInitialBlockDownload() const
     if (m_cached_finished_ibd.load(std::memory_order_relaxed))
         return false;
     if (fImporting || fReindex)
+    {
+        LogPrintf("InitialBlockDownload importing\n");
         return true;
+    }
     if (m_chain.Tip() == nullptr)
+    {
+        //LogPrintf("InitialBlockDownload null tip\n");
         return true;
+    }
     if (m_chain.Tip()->nChainWork < nMinimumChainWork && m_chain.Tip()->IsProofOfStake())
+    {
+        //LogPrintf("InitialBlockDownload small work\n");
         return true;
+    }
     if (m_chain.Tip()->nHeight > COINBASE_MATURITY
         && m_chain.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
+    {
+        //LogPrintf("InitialBlockDownload maturity\n");
         return true;
+    }
     if (fGraviocoinMode
         && (GetNumPeers() < 1
             || m_chain.Tip()->nHeight < GetNumBlocksOfPeers()-10))
+    {
+        //LogPrintf("InitialBlockDownload gravio\n");
         return true;
+    }
 
     LogPrintf("Leaving InitialBlockDownload (latching to false)\n");
     m_cached_finished_ibd.store(true, std::memory_order_relaxed);

@@ -358,7 +358,7 @@ static CBlock CreateGenesisBlockTestNet(uint32_t nTime, uint32_t nNonce, uint32_
 
 static CBlock CreateGenesisBlockMainNet(uint32_t nTime, uint32_t nNonce, uint32_t nBits)
 {
-    const char *pszTimestamp = "BTC 00000000000000000005091a82ce770df2f6701e259a1f4ee35ab4afe8367e90";
+    const char *pszTimestamp = "BTC 00000000000000000005c7b599127124f98f0ad17a4e81ad2a270b82735c9a2f";
 
     CMutableTransaction txNew;
     txNew.nVersion = GIO_TXN_VERSION;
@@ -376,14 +376,14 @@ static CBlock CreateGenesisBlockMainNet(uint32_t nTime, uint32_t nNonce, uint32_
 
     // Exchange
     out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 13550000 * COIN;
-    out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex("42e0c72cd20c4d1625e9164e6224b7603d8c3af") << OP_EQUALVERIFY << OP_CHECKSIG;
+    out->nValue = 11633350 * COIN;
+    out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex("f42e0c72cd20c4d1625e9164e6224b7603d8c3af") << OP_EQUALVERIFY << OP_CHECKSIG;
     txNew.vpout.push_back(out);
 
     // Stake
     for(int i = 0; i < 1000; i++) {
         out = MAKE_OUTPUT<CTxOutStandard>();
-        out->nValue = 10 * COIN;
+        out->nValue = 1000 * COIN;
         out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex("84ea75f5cf8c3d65c4e227bf718ac60cdb92e0bb") << OP_EQUALVERIFY << OP_CHECKSIG;
         txNew.vpout.push_back(out);
     }
@@ -546,8 +546,10 @@ public:
         m_assumed_blockchain_size = 1;
         m_assumed_chain_state_size = 1;
 
-        genesis = CreateGenesisBlockMainNet(1588075845, 120346, 0x1f00ffff); // 2017-07-17 13:00:00
-        // for(unsigned int i = 1; i < 200000; i++)
+        //std::cout << "start gen " << std::endl;
+
+        genesis = CreateGenesisBlockMainNet(1588075845, 67609, 0x1f00ffff); // 2017-07-17 13:00:00
+        //for(unsigned int i = 1; i < 300000; i++)
         // {
         //     genesis = CreateGenesisBlockMainNet(1588075845, i, 0x1f00ffff); // 2017-07-17 13:00:00
         //     uint256 hash = genesis.GetHash();
@@ -557,15 +559,16 @@ public:
         //         break;
         //     }
         // }
+        //std::cout << "finish gen " << std::endl;
         consensus.hashGenesisBlock = genesis.GetHash();
 
         // std::cout<<consensus.hashGenesisBlock.ToString()<<std::endl;
         // std::cout<<genesis.hashMerkleRoot.ToString()<<std::endl;
         // std::cout<<genesis.hashWitnessMerkleRoot.ToString()<<std::endl;
 
-        assert(consensus.hashGenesisBlock == uint256S("000005a67560338b9718fa346889e3c732e27d0c516ed6a9eaab8882922dc3fd"));
-        assert(genesis.hashMerkleRoot == uint256S("cca286bf8f32afb31c5a65a08ebeeaa36faa286bfb5fecf2c99fdcf3102c47dc"));
-        assert(genesis.hashWitnessMerkleRoot == uint256S("e90f23d725b25f3481615edfda74b3db3cb682193b4c821a2ed8ae19c2e61c7a"));
+        assert(consensus.hashGenesisBlock == uint256S("0000c52eada56ee20d21d49bd3a2aeded79a40818b206eb3698a866a405afc98"));
+        assert(genesis.hashMerkleRoot == uint256S("b42305347abdf6bf032a6a1ff714991e5ebbf61f61319472cec61fbf0fb3404b"));
+        assert(genesis.hashWitnessMerkleRoot == uint256S("f319752c08a6ed58782cc9339dcb8957aeafd2257c406cca2dcd8ba863fc3076"));
 
         // assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
         // assert(genesis.hashMerkleRoot == uint256S("0xc95fb023cf4bc02ddfed1a59e2b2f53edd1a726683209e2780332edf554f1e3e"));

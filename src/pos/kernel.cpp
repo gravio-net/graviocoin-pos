@@ -106,7 +106,10 @@ bool CheckStakeKernelHash(const CBlockIndex *pindexPrev,
 
     // Now check if proof-of-stake hash meets target protocol
     if (UintToArith256(hashProofOfStake) > bnTarget)
+    {
+        //LogPrintf("%s: POS hash does not meets.\n", __func__);
         return false;
+    }
 
     if (LogAcceptCategory(BCLog::POS) && !fPrintProofOfStake) {
         LogPrintf("%s: using modifier=%s at height=%d timestamp=%s\n",
@@ -117,6 +120,8 @@ bool CheckStakeKernelHash(const CBlockIndex *pindexPrev,
             nBlockFromTime, prevout.n, nTime,
             hashProofOfStake.ToString());
     }
+
+    LogPrintf("%s: POS hash is ok.\n", __func__);
 
     return true;
 }
@@ -310,7 +315,7 @@ bool CheckProofOfStake(BlockValidationState &state, const CBlockIndex *pindexPre
             return state.Invalid(BlockValidationResult::DOS_100, "invalid-prevout");
         }
 
-        nDepth = pindexPrev->nHeight - coin.nHeight;
+        nDepth = pindexPrev->nHeight - coin.nHeight + 1;
         int nRequiredDepth = std::min((int)(Params().GetStakeMinConfirmations()-1), (int)(pindexPrev->nHeight / 2));
         if (nRequiredDepth > nDepth) {
             LogPrintf("ERROR: %s: Tried to stake at depth %d\n", __func__, nDepth + 1);
@@ -433,13 +438,15 @@ bool CheckKernel(const CBlockIndex *pindexPrev, unsigned int nBits, int64_t nTim
 
     CBlockIndex *pindex = ::ChainActive()[coin.nHeight];
     if (!pindex) {
+        LogPrintf("%s: No pindex.\n", __func__);
         return false;
     }
 
     int nRequiredDepth = std::min((int)(Params().GetStakeMinConfirmations()-1), (int)(pindexPrev->nHeight / 2));
-    int nDepth = pindexPrev->nHeight - coin.nHeight;
+    int nDepth = pindexPrev->nHeight - coin.nHeight + 1;
 
     if (nRequiredDepth > nDepth) {
+        LogPrintf("%s: Required depth more. required %d found %d \n", __func__, nRequiredDepth, nDepth);
         return false;
     }
     if (pBlockTime) {

@@ -12305,6 +12305,21 @@ void CHDWallet::AvailableCoinsForStaking(std::vector<COutput> &vCoins, int64_t n
         int min_stake_confirmations = Params().GetStakeMinConfirmations();
         int nRequiredDepth = std::min(min_stake_confirmations-1, (int)(nHeight / 2));
 
+        
+
+        int nDepthLow = 0;
+        int nNotMature = 0;
+        int nCheckOut = 0;
+        int nCheckedOuts = 0;
+        int nNotStandart = 0;
+        int nUsed = 0;
+        int nNotExtarct = 0;
+        int nNotMine = 0;
+        int nNeedHard = 0;
+        int nStakeUsed = 0;
+        int nSpent = 0;
+        int nLocked = 0;
+
         for (const auto &walletEntry : mapWallet) {
             const CWalletTx *pcoin = &walletEntry.second;
             CTransactionRef tx = pcoin->tx;
@@ -12316,38 +12331,55 @@ void CHDWallet::AvailableCoinsForStaking(std::vector<COutput> &vCoins, int64_t n
             }
 
             if (nDepth < nRequiredDepth) {
+                nDepthLow++;
                 continue;
             }
 
             if (pcoin->IsCoinStake() && min_stake_confirmations < COINBASE_MATURITY) {
                 // min_stake_confirmations is only less than COINBASE_MATURITY in regtest mode
                 if (nDepth < std::min(COINBASE_MATURITY, (int)(nHeight / 2))) {
+                    nNotMature++;
                     continue;
                 }
             }
+
+            nCheckOut++;
+
+            nCheckedOuts += tx->vpout.size();
 
             const uint256 &wtxid = walletEntry.first;
             for (size_t i = 0; i < tx->vpout.size(); ++i) {
                 const auto &txout = tx->vpout[i];
                 if (!txout->IsType(OUTPUT_STANDARD)) {
+                    nNotStandart++;
                     continue;
                 }
 
                 COutPoint kernel(wtxid, i);
+                if(!CheckStakeUnused(kernel))
+                    nUsed++;
+                if(IsSpent(wtxid, i))
+                    nSpent++;
+                if(IsLockedCoin(wtxid, i))
+                    nLocked++;
+
                 if (!CheckStakeUnused(kernel)
                      || IsSpent(wtxid, i)
                      || IsLockedCoin(wtxid, i)) {
+                    nUsed++;
                     continue;
                 }
 
                 const CScript *pscriptPubKey = txout->GetPScriptPubKey();
                 CKeyID keyID;
                 if (!ExtractStakingKeyID(*pscriptPubKey, keyID)) {
+                    nNotExtarct++;
                     continue;
                 }
 
                 isminetype mine = IsMine(keyID);
                 if (!(mine & ISMINE_SPENDABLE)) {
+                    nNotMine++;
                     continue;
                 }
 
@@ -12356,12 +12388,15 @@ void CHDWallet::AvailableCoinsForStaking(std::vector<COutput> &vCoins, int64_t n
                 bool fNeedHardwareKey = (mine & ISMINE_HARDWARE_DEVICE);
 
                 if (fNeedHardwareKey) {
+                    nNeedHard++;
                     continue;
                 }
 
                 vCoins.emplace_back(pcoin, i, nDepth, fSpendableIn, fSolvableIn, true, true, fNeedHardwareKey, false);
             }
         }
+
+        WalletLogPrintf("%s: Check wallet transaction count %d, %d, %d, %d. Outputs nCheckedOuts %d nNotStandart %d nUsed %d nNotExtarct %d nNotMine %d nNeedHard %d nStakeUsed %d nSpent %d nLocked %d\n", __func__, mapWallet.size(), nDepthLow, nNotMature, nCheckOut, nCheckedOuts, nNotStandart, nUsed, nNotExtarct, nNotMine, nNeedHard, nStakeUsed, nSpent, nLocked);
 
         for (const auto &ri : mapRecords) {
             const uint256 &txid = ri.first;
@@ -12427,14 +12462,18 @@ void CHDWallet::AvailableCoinsForStaking(std::vector<COutput> &vCoins, int64_t n
 bool CHDWallet::SelectCoinsForStaking(int64_t nTargetValue, int64_t nTime, int nHeight, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const
 {
     if (m_have_cached_stakeable_coins) {
+        WalletLogPrintf("%s: Have stakeable coins\n", __func__);
         random_shuffle(m_cached_stakeable_coins.begin(), m_cached_stakeable_coins.end(), GetRandInt);
     } else {
+        WalletLogPrintf("%s: Don't have stakeable coins\n", __func__);
         m_cached_stakeable_coins.clear();
         AvailableCoinsForStaking(m_cached_stakeable_coins, nTime, nHeight);
         m_have_cached_stakeable_coins = true;
     }
 
     std::vector<COutput> &vCoins = m_cached_stakeable_coins;
+
+    WalletLogPrintf("%s: AvailableCoinsForStaking %d.\n", __func__, vCoins.size());
 
     setCoinsRet.clear();
     nValueRet = 0;
@@ -12476,6 +12515,7 @@ bool CHDWallet::CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHei
 
     CAmount nBalance = GetSpendableBalance();
     if (nBalance <= nReserveBalance) {
+        WalletLogPrintf("%s: Not enough balance.\n", __func__);
         return false;
     }
 
@@ -12486,10 +12526,12 @@ bool CHDWallet::CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHei
 
     // Select coins with suitable depth
     if (!SelectCoinsForStaking(nBalance - nReserveBalance, nTime, nBlockHeight, setCoins, nValueIn)) {
+        WalletLogPrintf("%s: Failed to select coins.\n", __func__);
         return false;
     }
 
     if (setCoins.empty()) {
+        WalletLogPrintf("%s: Set is empty.\n", __func__);
         return false;
     }
 
@@ -12498,9 +12540,12 @@ bool CHDWallet::CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHei
 
     std::set<std::pair<const CWalletTx*,unsigned int> >::iterator it = setCoins.begin();
 
+    WalletLogPrintf("%s: Check coin set.\n", __func__);
+
     for (; it != setCoins.end(); ++it) {
         auto pcoin = *it;
         if (ThreadStakeMinerStopped()) { // interruption_point
+            WalletLogPrintf("%s: Miner stopped.\n", __func__);
             return false;
         }
 
