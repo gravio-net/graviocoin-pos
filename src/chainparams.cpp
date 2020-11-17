@@ -546,12 +546,12 @@ public:
         m_assumed_blockchain_size = 1;
         m_assumed_chain_state_size = 1;
 
-        //std::cout << "start gen " << std::endl;
+        // std::cout << "start gen " << std::endl;
 
-        genesis = CreateGenesisBlockMainNet(1588075845, 67609, 0x1f00ffff); // 2017-07-17 13:00:00
-        //for(unsigned int i = 1; i < 300000; i++)
+        genesis = CreateGenesisBlockMainNet(1588075845, 5177, 0x1f00ffff); 
+        // for(unsigned int i = 1; i < 300000; i++)
         // {
-        //     genesis = CreateGenesisBlockMainNet(1588075845, i, 0x1f00ffff); // 2017-07-17 13:00:00
+        //     genesis = CreateGenesisBlockMainNet(1588075845, i, 0x1f00ffff); 
         //     uint256 hash = genesis.GetHash();
         //     if(UintToArith256(hash).GetCompact() < 520159231)
         //     {
@@ -559,20 +559,16 @@ public:
         //         break;
         //     }
         // }
-        //std::cout << "finish gen " << std::endl;
+        // std::cout << "finish gen " << std::endl;
         consensus.hashGenesisBlock = genesis.GetHash();
 
         // std::cout<<consensus.hashGenesisBlock.ToString()<<std::endl;
         // std::cout<<genesis.hashMerkleRoot.ToString()<<std::endl;
         // std::cout<<genesis.hashWitnessMerkleRoot.ToString()<<std::endl;
 
-        assert(consensus.hashGenesisBlock == uint256S("0000c52eada56ee20d21d49bd3a2aeded79a40818b206eb3698a866a405afc98"));
-        assert(genesis.hashMerkleRoot == uint256S("b42305347abdf6bf032a6a1ff714991e5ebbf61f61319472cec61fbf0fb3404b"));
-        assert(genesis.hashWitnessMerkleRoot == uint256S("f319752c08a6ed58782cc9339dcb8957aeafd2257c406cca2dcd8ba863fc3076"));
-
-        // assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
-        // assert(genesis.hashMerkleRoot == uint256S("0xc95fb023cf4bc02ddfed1a59e2b2f53edd1a726683209e2780332edf554f1e3e"));
-        // assert(genesis.hashWitnessMerkleRoot == uint256S("0x619e94a7f9f04c8a1d018eb8bcd9c42d3c23171ebed8f351872256e36959d66c"));
+        assert(consensus.hashGenesisBlock == uint256S("00005e6499c638e48fcf9e14fdbc76452c9da04500c2e314b2786ef4ec762c8f"));
+        assert(genesis.hashMerkleRoot == uint256S("671f9a13e4ca6cba707d8d35de5b384f885b7a819eceeffb50d3c3d9b6e0ebe7"));
+        assert(genesis.hashWitnessMerkleRoot == uint256S("c1ed7a20ecc3fe82f56d3dd4be5e80133f374023d130aaf1a7f6a65c5851f921"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
