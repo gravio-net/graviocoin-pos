@@ -370,13 +370,13 @@ static CBlock CreateGenesisBlockMainNet(uint32_t nTime, uint32_t nNonce, uint32_
 
     // Premine
     OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 2007950 * COIN;
+    out->nValue = 1000000 * COIN;
     out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex("87bb0b12420c56e2fcb17336f65af2ce122fc1aa") << OP_EQUALVERIFY << OP_CHECKSIG;
     txNew.vpout.push_back(out);
 
     // Exchange
     out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 11633350 * COIN;
+    out->nValue = 11924482 * COIN;
     out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex("f42e0c72cd20c4d1625e9164e6224b7603d8c3af") << OP_EQUALVERIFY << OP_CHECKSIG;
     txNew.vpout.push_back(out);
 
