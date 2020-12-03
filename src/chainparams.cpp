@@ -548,7 +548,7 @@ public:
 
         // std::cout << "start gen " << std::endl;
 
-        genesis = CreateGenesisBlockMainNet(1588075845, 5177, 0x1f00ffff); 
+        genesis = CreateGenesisBlockMainNet(1588075845, 88633, 0x1f00ffff); 
         // for(unsigned int i = 1; i < 300000; i++)
         // {
         //     genesis = CreateGenesisBlockMainNet(1588075845, i, 0x1f00ffff); 
@@ -566,21 +566,14 @@ public:
         // std::cout<<genesis.hashMerkleRoot.ToString()<<std::endl;
         // std::cout<<genesis.hashWitnessMerkleRoot.ToString()<<std::endl;
 
-        assert(consensus.hashGenesisBlock == uint256S("00005e6499c638e48fcf9e14fdbc76452c9da04500c2e314b2786ef4ec762c8f"));
-        assert(genesis.hashMerkleRoot == uint256S("671f9a13e4ca6cba707d8d35de5b384f885b7a819eceeffb50d3c3d9b6e0ebe7"));
-        assert(genesis.hashWitnessMerkleRoot == uint256S("c1ed7a20ecc3fe82f56d3dd4be5e80133f374023d130aaf1a7f6a65c5851f921"));
+        assert(consensus.hashGenesisBlock == uint256S("0000550d235ef4051fa555ca8376924a98f066adf5aec489d2590b966599c93f"));
+        assert(genesis.hashMerkleRoot == uint256S("fdc7961395b7865215fbfbffb0b439441ffae87e88f6a2d8ab11bdbc0fe8b79b"));
+        assert(genesis.hashWitnessMerkleRoot == uint256S("a3e9d3ccd77988eaa12320133cfdade9c347a5d27c2b5ca7797c88d9570f11ed"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
-
-
-        // vDevFundSettings.emplace_back(0,
-        //     DevFundSettings("RJAPhgckEgRGVPZa9WoGSWW24spskSfLTQ", 10, 60));
-        // vDevFundSettings.emplace_back(consensus.OpIsCoinstakeTime,
-        //     DevFundSettings("RBiiQBnQsVPPQkUaJVQTjsZM9K2xMKozST", 10, 60));
-
 
         base58Prefixes[PUBKEY_ADDRESS]     = {0x26}; // G
         base58Prefixes[SCRIPT_ADDRESS]     = {0x3c};
