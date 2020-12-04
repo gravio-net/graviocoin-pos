@@ -134,7 +134,7 @@ static const int MAX_UNCONNECTING_HEADERS = 10;
 
 static const size_t MAX_STAKE_SEEN_SIZE = 1000;
 
-inline int64_t FutureDrift(int64_t nTime) { return nTime + 15; } // FutureDriftV2
+inline int64_t FutureDrift(int64_t nTime) { return nTime + 600; } // FutureDriftV2
 
 typedef int64_t NodeId;
 
