@@ -47,10 +47,10 @@ std::string GetWarnings(bool verbose)
     LOCK(cs_warnings);
 
     // Pre-release build warning
-    if (!CLIENT_VERSION_IS_RELEASE) {
-        warnings_concise = "This is a pre-release test build - use at your own risk - do not use for mining or merchant applications";
-        warnings_verbose = _("This is a pre-release test build - use at your own risk - do not use for mining or merchant applications").translated;
-    }
+    // if (!CLIENT_VERSION_IS_RELEASE) {
+    //     warnings_concise = "This is a pre-release test build - use at your own risk - do not use for mining or merchant applications";
+    //     warnings_verbose = _("This is a pre-release test build - use at your own risk - do not use for mining or merchant applications").translated;
+    // }
 
     // Misc warnings like out of disk space and clock is wrong
     if (strMiscWarning != "") {
