@@ -44,7 +44,7 @@ int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex *pindexPrev, int64
     if(pindexPrev->nHeight > nSubsidyFirstHalving)
     {
         int nHeight = pindexPrev->nHeight - nSubsidyFirstHalving;
-        int halvings = 1 + nHeight / nSubsidyHalving;
+        halvings = 1 + nHeight / nSubsidyHalving;
     }
     
     // Force block reward to zero when right shift is undefined.
@@ -537,7 +537,7 @@ public:
         nTargetSpacing = 120;           // 2 minutes
         nTargetTimespan = 24 * 60;      // 24 mins
         nSubsidyHalving = 500000;
-        nSubsidyFirstHalving = 170000;
+        nSubsidyFirstHalving = 250000;
 
         AddImportHashesMain(vImportedCoinbaseTxns);
         SetLastImportHeight();
