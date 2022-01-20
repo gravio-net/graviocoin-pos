@@ -4592,6 +4592,13 @@ void ReadCoinControlOptions(const UniValue &obj, CHDWallet *pwallet, CCoinContro
 
 static UniValue SendToInner(const JSONRPCRequest &request, OutputTypes typeIn, OutputTypes typeOut)
 {
+    if ((typeIn == OUTPUT_RINGCT || typeOut == OUTPUT_RINGCT)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Disabled output type.");
+    }
+
+    if ((typeIn == OUTPUT_CT || typeOut == OUTPUT_CT)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Disabled output type.");
+    }
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
     CHDWallet *const pwallet = GetGraviocoinWallet(wallet.get());
     if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {

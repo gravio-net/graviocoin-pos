@@ -23,6 +23,11 @@
 bool VerifyMLSAG(const CTransaction &tx, TxValidationState &state)
 {
     const Consensus::Params &consensus = Params().GetConsensus();
+
+    if (state.m_exploit_fix_1) {
+        return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-txns-anon-disabled");
+    }
+
     int rv;
     std::set<int64_t> setHaveI; // Anon prev-outputs can only be used once per transaction.
     std::set<CCmpPubKey> setHaveKI;
@@ -53,6 +58,7 @@ bool VerifyMLSAG(const CTransaction &tx, TxValidationState &state)
     if (fSplitCommitments) {
         vpInputSplitCommits.reserve(tx.vin.size());
     }
+    uint256 txhash = tx.GetHash();
 
     for (const auto &txin : tx.vin) {
         if (!txin.IsAnonInput()) {
@@ -68,8 +74,6 @@ bool VerifyMLSAG(const CTransaction &tx, TxValidationState &state)
         if (nRingSize < MIN_RINGSIZE || nRingSize > MAX_RINGSIZE) {
             return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-anon-ringsize");
         }
-
-        uint256 txhash = tx.GetHash();
 
         size_t nCols = nRingSize;
         size_t nRows = nInputs + 1;
@@ -175,7 +179,7 @@ bool VerifyMLSAG(const CTransaction &tx, TxValidationState &state)
             }
         }
         if (0 != (rv = secp256k1_prepare_mlsag(&vM[0], nullptr,
-            vpOutCommits.size(), vpOutCommits.size(), nCols, nRows,
+            vpOutCommits.size(), 0, nCols, nRows,
             &vpInCommits[0], &vpOutCommits[0], nullptr))) {
             LogPrintf("ERROR: %s: prepare-mlsag-failed %d\n", __func__, rv);
             return state.Invalid(TxValidationResult::TX_CONSENSUS, "prepare-mlsag-failed");

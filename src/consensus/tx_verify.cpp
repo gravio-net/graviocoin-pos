@@ -208,14 +208,14 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, TxValidationState& state, 
     }
 
     std::vector<const secp256k1_pedersen_commitment*> vpCommitsIn, vpCommitsOut;
-    size_t nStandard = 0, nCt = 0, nRingCT = 0;
+    size_t nStandard = 0, nCt = 0, nRingCTInputs = 0;
     CAmount nValueIn = 0;
     CAmount nFees = 0;
     for (unsigned int i = 0; i < tx.vin.size(); i++)
     {
         if (tx.vin[i].IsAnonInput()) {
             state.fHasAnonInput = true;
-            nRingCT++;
+            nRingCTInputs++;
             continue;
         }
 
@@ -265,20 +265,22 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, TxValidationState& state, 
         }
     }
 
-    if ((nStandard > 0) + (nCt > 0) + (nRingCT > 0) > 1) {
+    if ((nStandard > 0) + (nCt > 0) + (nRingCTInputs > 0) > 1) {
         return state.Invalid(TxValidationResult::TX_CONSENSUS, "mixed-input-types");
     }
 
-    size_t nRingCTInputs = nRingCT;
+    size_t nRingCTOutputs = 0;
     // GetPlainValueOut adds to nStandard, nCt, nRingCT
-    CAmount nPlainValueOut = tx.GetPlainValueOut(nStandard, nCt, nRingCT);
-    state.fHasAnonOutput = nRingCT > nRingCTInputs;
+    //CAmount nPlainValueOut = tx.GetPlainValueOut(nStandard, nCt, nRingCT);
+    //state.fHasAnonOutput = nRingCT > nRingCTInputs;
+    CAmount nPlainValueOut = tx.GetPlainValueOut(nStandard, nCt, nRingCTOutputs);
+    state.fHasAnonOutput = nRingCTOutputs > 0;
 
     txfee = 0;
     if (is_graviocoin_tx) {
         if (!tx.IsCoinStake()) {
             // Tally transaction fees
-            if (nCt > 0 || nRingCT > 0) {
+            if (nCt > 0 ||  nRingCTOutputs > 0 || nRingCTInputs > 0) {
                 if (!tx.GetCTFee(txfee)) {
                     LogPrintf("%s: bad-fee-output\n", __func__);
                     return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-fee-output");
@@ -319,7 +321,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, TxValidationState& state, 
         } else {
             // Return stake reward in txfee
             txfee = nPlainValueOut - nValueIn;
-            if (nCt > 0 || nRingCT > 0) { // Counters track both outputs and inputs
+            if (nCt > 0 ||  nRingCTOutputs > 0 || nRingCTInputs > 0) { // Counters track both outputs and inputs
                 LogPrintf("%s: non-standard elements in coinstake\n", __func__);
                 return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-coinstake-output");
             }
@@ -338,7 +340,19 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, TxValidationState& state, 
         }
     }
 
-    if (nCt > 0 && nRingCT == 0) {
+    if ((nCt > 0 || nRingCTOutputs > 0) && nRingCTInputs == 0) {
+        if (state.m_exploit_fix_1 &&
+            nRingCTOutputs > 0) {
+            return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-txns-anon-disabled");
+        }
+        if (state.m_exploit_fix_1 &&
+            nCt > 0 ) {
+            return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-txns-blind-disabled");
+        }
+        if (!state.m_exploit_fix_1 && nCt == 0) {
+            return true;
+        }
+
         nPlainValueOut += txfee;
 
         if (!MoneyRange(nPlainValueOut)) {

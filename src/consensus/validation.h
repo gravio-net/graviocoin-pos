@@ -13,6 +13,8 @@
 #include <primitives/block.h>
 #include <consensus/params.h>
 
+extern int64_t EXPLOIT_FIX_HF1_TIME; // TODO: Remove
+
 /** A "reason" why a transaction was invalid, suitable for determining whether the
   * provider of the transaction should be banned/ignored/disconnected/etc.
   */
@@ -128,6 +130,7 @@ public:
     bool fHasAnonInput = false; // per tx
     bool fIncDataOutputs = false; // per block
     int m_spend_height = 0;
+    bool m_exploit_fix_1 = false;
     bool m_graviocoin_mode = false;
     bool m_skip_rangeproof = false;
     const Consensus::Params *m_consensus_params = nullptr;
@@ -144,6 +147,7 @@ public:
         }
         m_graviocoin_mode = graviocoin_mode;
         m_skip_rangeproof = skip_rangeproof;
+	m_exploit_fix_1 = time >= EXPLOIT_FIX_HF1_TIME; // TODO: consensusParams.exploit_fix_1_time;
     }
 
     int nodeId;
