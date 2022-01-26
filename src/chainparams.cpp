@@ -492,7 +492,7 @@ public:
         consensus.bulletproof_time = 0x5D2DBC40;        // 2019-07-16 12:00:00
         consensus.rct_time = 0x5D2DBC40;                // 2019-07-16 12:00:00
         consensus.smsg_difficulty_time = 0x5D2DBC40;    // 2019-07-16 12:00:00
-	consensus.exploit_fix_1_time = 0x61EA59F0;
+	consensus.exploit_fix_1_time = 0x61C4E351;
 
         consensus.smsg_fee_period = 5040;
         consensus.smsg_fee_funding_tx_per_k = 200000;
@@ -670,7 +670,7 @@ public:
         consensus.bulletproof_time = 0x5D2DBC40;        // 2019-07-16 12:00:00
         consensus.rct_time = 0x5D2DBC40;                // 2019-07-16 12:00:00
         consensus.smsg_difficulty_time = 0x5D2DBC40;    // 2019-07-16 12:00:00
-	consensus.exploit_fix_1_time = 0x61EA59F0;
+	consensus.exploit_fix_1_time = 0x61C4E351;
 
         consensus.smsg_fee_period = 5040;
         consensus.smsg_fee_funding_tx_per_k = 200000;
@@ -847,7 +847,7 @@ public:
         consensus.bulletproof_time = 0x5C67FB40;        // 2019-02-16 12:00:00
         consensus.rct_time = 0;
         consensus.smsg_difficulty_time = 0x5D19F5C0;    // 2019-07-01 12:00:00
-	consensus.exploit_fix_1_time = 0x61EA59F0;
+	consensus.exploit_fix_1_time = 0x61C4E351;
 
         consensus.smsg_fee_period = 5040;
         consensus.smsg_fee_funding_tx_per_k = 200000;

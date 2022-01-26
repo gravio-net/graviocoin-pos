@@ -1310,7 +1310,7 @@ bool AppInitParameterInteraction()
     nMaxTipAge = gArgs.GetArg("-maxtipage", DEFAULT_MAX_TIP_AGE);
 
     // Remove
-    EXPLOIT_FIX_HF1_TIME = 1642748400;
+    EXPLOIT_FIX_HF1_TIME = 1640293201;
 
     return true;
 }
